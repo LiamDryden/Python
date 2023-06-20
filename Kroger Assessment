@@ -1,0 +1,60 @@
+import pandas as pd
+
+# Path to the Excel file
+file_path = 'Hours by Task.xlsx'
+
+# List to store data frames from each table
+table_data_frames = []
+
+# Read each table from the Excel file
+excel_data = pd.read_excel(file_path, sheet_name=None)
+
+# Iterate over each sheet
+for sheet_name, data_frame in excel_data.items():
+    table_data_frames.append(data_frame)
+
+# Combine all tables into one table
+combined_table = pd.concat(table_data_frames, ignore_index=True)
+
+# Display the combined table
+print(combined_table)
+
+
+# Read the "Hours by Task.xlsx" file, and input any one of the four sheet names provided. In this case, it is Cincinnati.
+hours_data = pd.read_excel('Hours by Task.xlsx', sheet_name = '014_Cincinnati')
+
+# Calculate total hours for each task
+task_hours = hours_data.groupby('Task')['Hours'].sum().reset_index()
+
+# Sort tasks by total hours in descending order
+task_hours_sorted = task_hours.sort_values('Hours', ascending = False)
+
+# Display the top 5 tasks with the highest total hours
+top_tasks = task_hours_sorted.head(5)
+print("Top 5 time-consuming tasks:")
+print(top_tasks)
+
+
+# Read the "Task Category Mapping.xlsx" file
+category_data = pd.read_excel('Task Category Mapping.xlsx')
+
+# Merge the hours data with the category data
+merged_data = pd.merge(hours_data, category_data, on='Task', how='left')
+
+# Display the merged data with categorized tasks
+print("Merged data with categorized tasks:")
+print(merged_data)
+
+
+# Read the "Store Square Feet.csv" file
+store_size_data = pd.read_csv('Store Square Feet.csv')
+
+# Merge the merged_data with store size data
+merged_data_with_size = pd.merge(merged_data, store_size_data, left_on='Store', right_on='Div_Store', how='left')
+
+# Analyze task distribution based on store size
+task_distribution_by_size = merged_data_with_size.groupby('Store_Square_Feet')['Task'].count().reset_index()
+
+# Display the task distribution by store size
+print("Task distribution by store size:")
+print(task_distribution_by_size)
